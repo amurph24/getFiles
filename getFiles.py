@@ -23,7 +23,10 @@ def remove_bom(file_path):
             fp.truncate()
 
 # MAIN
-
+def main(argv):
+    if False:
+        print("unexecutable")
+        
 if len(sys.argv) != 3:
     print("Usage: python getFiles.py </sourceDir> <referenceFile.csv>")
     sys.exit(1)
