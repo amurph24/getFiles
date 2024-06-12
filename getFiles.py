@@ -27,56 +27,58 @@ def main(argv):
     if False:
         print("unexecutable")
         
-if len(sys.argv) != 3:
-    print("Usage: python getFiles.py </sourceDir> <referenceFile.csv>")
-    sys.exit(1)
+    if len(argv) != 3:
+        print("Usage: python getFiles.py </sourceDir> <referenceFile.csv>")
+        sys.exit(1)
 
-# args
-source_dir = sys.argv[1]
-output_dir = "out"
-referenceFile = sys.argv[2]
-keyColumnName = "StudentNumber"
+    # args
+    source_dir = argv[1]
+    output_dir = "out"
+    referenceFile = argv[2]
+    keyColumnName = "StudentNumber"
 
-# prep files and output dir
-remove_bom(referenceFile)
-shutil.rmtree(output_dir)
-os.mkdir(output_dir)
+    # prep files and output dir
+    remove_bom(referenceFile)
+    shutil.rmtree(output_dir)
+    os.mkdir(output_dir)
 
-# extract keys from .csv
-with open(sys.argv[2]) as f:
-    lines = f.readlines()
-    lines = [line.split(",") for line in lines]
-try:
-    keyIndex = lines[0].index(keyColumnName)
-except:
-    print(f"{referenceFile} does not contain a \"{keyColumnName}\" column, please double check this column is named correctly")
-    sys.exit(1)
-keys = [line[keyIndex] for line in lines]
-keys.pop(0)
+    # extract keys from .csv
+    with open(argv[2]) as f:
+        lines = f.readlines()
+        lines = [line.split(",") for line in lines]
+    try:
+        keyIndex = lines[0].index(keyColumnName)
+    except:
+        print(f"{referenceFile} does not contain a \"{keyColumnName}\" column, please double check this column is named correctly")
+        sys.exit(1)
+    keys = [line[keyIndex] for line in lines]
+    keys.pop(0)
 
 
-missingkeys = []
-foundfiles = []
-# get lists of missing/present files
-for key in keys:
-    regex = re.compile(f'.*{key}.*')
-    source = ""
-    for root, dirs, files in os.walk(source_dir):
-        for file in files:
-            if regex.match(file):
-                print(f"file containing key:{key} found, using: {file}")
-                source = os.path.join(source_dir, file)
-                break
+    missingkeys = []
+    foundfiles = []
+    # get lists of missing/present files
+    for key in keys:
+        regex = re.compile(f'.*{key}.*')
+        source = ""
+        for root, dirs, files in os.walk(source_dir):
+            for file in files:
+                if regex.match(file):
+                    print(f"file containing key:{key} found, using: {file}")
+                    source = os.path.join(source_dir, file)
+                    break
 
-    # error handling if no feedback file
-    if len(source) == 0:
-        missingkeys.append(key)
-        continue
+        # error handling if no feedback file
+        if len(source) == 0:
+            missingkeys.append(key)
+            continue
 
-    foundfiles.append(source)
+        foundfiles.append(source)
 
-# copy files into new dir
-for file in foundfiles:
-    shutil.copy2(file,output_dir)
+    # copy files into new dir
+    for file in foundfiles:
+        shutil.copy2(file,output_dir)
 
-print("could not find files matching the following keys:\n" + str(missingkeys))
+    print("could not find files matching the following keys:\n" + str(missingkeys))
+
+main(sys.argv)
